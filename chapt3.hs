@@ -52,12 +52,22 @@ t = Node 3 (Node 2 (Empty)
 
 
 -- Define the types for 2d points and directions
-data Point2D = Point2D Double Double
-               deriving (Show, Eq)
+data Point2D = Point2D {
+        getX :: Double
+      , getY :: Double
+      } deriving (Eq)
+
+instance Show Point2D where 
+  show (Point2D x y) = show (x, y)
 
 data Direction = DLeft | DRight | DStraight
                  deriving (Show)
 
+-- Square distance between two points
+dist :: Point2D -> Point2D -> Double
+dist a b = dx*dx + dy*dy
+  where dx = (getX a)-(getX b)
+        dy = (getY a)-(getY b)
 
 -- Determine which direction you turn going through the points in order given
 whichDir :: Point2D -> Point2D -> Point2D -> Direction
@@ -73,16 +83,50 @@ pb = Point2D   0  0
 pc = Point2D   0  2
 pd = Point2D   2  0
 pe = Point2D   1  1
+pts = [pa, pb, pc, pd, pe, 
+  Point2D 1 3,
+  Point2D 3 1,
+  Point2D 2 2,
+  Point2D 2 3]
 
 -- Given list of points, compute direction of each consecutive triple
 tripleDirs :: [Point2D] -> [Direction]
 tripleDirs (a:b:c:xs) = (whichDir a b c) : (tripleDirs (b:c:xs))
 tripleDirs _          = []
 
--- TODO convex hull using Graham scan
--- Find lowest-y point, call it p0
+-- Returns a list with the bottom most point first, 
+-- and the rest sorted in increasing polar angle order
+-- (w.r.t the bottom most point)
+sortPts pts = 
+  let p0 = minimumBy (compare `on` getX) pts in 
+    p0 : (sortBy (polarCmp p0) (delete p0 pts))
+    where polarCmp p0 p1 p2 = 
+            case (whichDir p0 p1 p2) of 
+              DRight -> GT
+              DLeft  -> LT
+              DStraight -> (compare (dist p0 p1) (dist p0 p2))
+      
+
+-- Find a convex hull of a set of points using Graham scan
+-- TODO
+findHull :: [Point2D] -> [Point2D]
+findHull pts    =
+  sortPts pts 
+
+
+
+-- Find bottom-most point, call it p0
 -- Sort the other points using polar angle to p0
--- 
+
+
+
+
+
+
+
+
+
+
 
 
 
