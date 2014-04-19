@@ -61,7 +61,7 @@ instance Show Point2D where
   show (Point2D x y) = show (x, y)
 
 data Direction = DLeft | DRight | DStraight
-                 deriving (Show)
+                 deriving (Eq, Show)
 
 -- Square distance between two points
 dist :: Point2D -> Point2D -> Double
@@ -78,16 +78,20 @@ whichDir (Point2D x1 y1) (Point2D x2 y2) (Point2D x3 y3)
   where cross = (x2-x1)*(y3-y1) - (y2-y1)*(x3-x1)
 
 -- Some test points
-pa = Point2D (-2) 0
-pb = Point2D   0  0
-pc = Point2D   0  2
-pd = Point2D   2  0
-pe = Point2D   1  1
-pts = [pa, pb, pc, pd, pe, 
-  Point2D 1 3,
-  Point2D 3 1,
-  Point2D 2 2,
-  Point2D 2 3]
+pa = Point2D   1 0
+pb = Point2D   0 0
+pc = Point2D   0 2
+pd = Point2D   2 0
+pe = Point2D   1 1
+pts = [pa, pb, pc, pd, pe
+  , Point2D 1 3
+  , Point2D 3 1
+  , Point2D 2 2
+  , Point2D (-1) (-1) -- these 4 points are the hull
+  , Point2D (-1) 10
+  , Point2D 10 (-1)
+  , Point2D 10 10
+  , Point2D 2 3]
 
 -- Given list of points, compute direction of each consecutive triple
 tripleDirs :: [Point2D] -> [Direction]
@@ -108,20 +112,20 @@ sortPts pts =
       
 
 -- Find a convex hull of a set of points using Graham scan
--- TODO
 findHull :: [Point2D] -> [Point2D]
-findHull pts    =
-  sortPts pts 
-
-
-
--- Find bottom-most point, call it p0
--- Sort the other points using polar angle to p0
-
-
-
-
-
+findHull pts =
+  findHull' (reverse (take 3 sorted)) (drop 3 sorted)
+  where sorted = sortPts pts
+        findHull' hullPts []           = hullPts
+        findHull' hullPts remainingPts = 
+            if dir == DRight
+            then findHull' 
+                    (tail hullPts) --Pop from stack
+                    remainingPts   -- Check the same point again
+            else findHull' 
+                    ((head remainingPts):hullPts) --Push point to stack if colinear or left turn
+                    (tail remainingPts) --Check remaining points
+            where dir = whichDir (head (tail hullPts)) (head hullPts) (head remainingPts)
 
 
 
