@@ -64,3 +64,65 @@ splitAt' f (x:xs) =
   else (x:(fst sp), snd sp)
     where sp = splitAt' f xs
 
+
+takeWhile' _ []     = []
+takeWhile' f (x:xs) = 
+  if f x
+  then x : (takeWhile' f xs)
+  else []
+
+dropWhile' _ []     = []
+dropWhile' f (x:xs) = 
+  if f x
+  then dropWhile' f xs
+  else (x:xs)
+
+-- Not efficient (2 traversals), but neat
+span' f l = (takeWhile' f l, dropWhile' f l)
+break' f l = (takeWhile' (\x -> not (f x)) l, dropWhile' (\x -> not (f x)) l)
+
+elem' _ []     = False
+elem' e (x:xs) = (x == e) || elem' e xs
+
+notElem' e l = not (elem' e l)
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' _ []     = []
+filter' f (x:xs)
+  | f x       = x : (filter' f xs)
+  | otherwise = filter' f xs
+
+isPrefixOf [] _ = True
+isPrefixOf _ [] = False
+isPrefixOf (p:ps) (l:ls) = p == l && isPrefixOf ps ls
+
+{-isInfixOf [] _ = True-}
+{-isInfixOf _ [] = False-}
+{-isInfixOf (d:ds) (l:ls)-}
+{-  | d == l    = isPrefixOf ds ls || isInfixOf (d:ds) ls-}
+{-  | otherwise = isInfixOf (d:ds) ls-}
+
+-- This is how haskell standard lib does them, amazing!
+isInfixOf needle haystack = any (isPrefixOf needle) (tails haystack)
+isSuffixOf p l = (reverse p) `isPrefixOf` (reverse l)
+tails xs = xs : case xs of
+                  []      -> []
+                  _ : xs' -> tails xs'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
