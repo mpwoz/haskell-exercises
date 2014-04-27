@@ -1,4 +1,4 @@
-import Data.Char (digitToInt)
+import Data.Char (digitToInt, isUpper)
 
 loop :: Int -> String -> Int
 loop acc []     = acc
@@ -83,4 +83,11 @@ unlines' xs = tail $ foldr (\s a -> '\n':s++a) "" xs
 words'   x  = foldr step [""] x
   where step l (w:ws) | l == ' ' = "":w:ws
                       | otherwise = (l:w):ws
+-- End exercises.
 
+
+compose :: (b -> c) -> (a -> b) -> a -> c
+compose fa fb x = fa (fb x)
+
+capCount :: String -> Int
+capCount = length . filter (isUpper . head) . words
