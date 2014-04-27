@@ -81,8 +81,8 @@ dropWhile' f l = snd (splitAt' (not . f) l)
 {-  else (x:xs)-}
 
 -- Not efficient (2 traversals), but neat
-span' f l = (takeWhile' f l, dropWhile' f l)
-break' f l = (takeWhile' (\x -> not (f x)) l, dropWhile' (\x -> not (f x)) l)
+span'  f l = (takeWhile' f l,         dropWhile' f l)
+break' f l = (takeWhile' (not . f) l, dropWhile' (not . f) l)
 
 elem' _ []     = False
 elem' e (x:xs) = (x == e) || elem' e xs
